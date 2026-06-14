@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Surat Menyurat Sekolah</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon" id="loginLogoContainer">
+                    <i class="fas fa-school" id="loginDefaultIcon"></i>
+                    <img id="loginLogoImg" src="" alt="Logo" style="display:none;">
+                </div>
+                <h1 id="loginSchoolName">Sistem Surat Sekolah</h1>
+                <p>Silakan masuk untuk melanjutkan</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <input type="text" id="loginUser" placeholder="Masukkan username" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPass" placeholder="Masukkan password" required>
+                        <button type="button" class="toggle-pass" id="togglePassBtn">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="loginError" class="login-error" style="display:none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="loginErrorText">Username atau password salah!</span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Masuk
+                </button>
+                <p class="login-hint">Default: admin / admin123</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="app-container" style="display:none;">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon" id="sidebarLogoContainer">
+                        <i class="fas fa-school" id="sidebarDefaultIcon"></i>
+                        <img id="sidebarLogoImg" src="" alt="Logo" style="display:none;">
+                    </div>
+                    <span id="sidebarSchoolName">Surat Sekolah</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-page="dashboard">
+                        <a href="#" data-nav="dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li data-page="identitas">
+                        <a href="#" data-nav="identitas">
+                            <i class="fas fa-building"></i>
+                            <span>Identitas Sekolah</span>
+                        </a>
+                    </li>
+                    <li data-page="data-guru">
+                        <a href="#" data-nav="data-guru">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <span>Data Guru</span>
+                        </a>
+                    </li>
+                    <li data-page="data-siswa">
+                        <a href="#" data-nav="data-siswa">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>Data Siswa</span>
+                        </a>
+                    </li>
+                    <li class="nav-divider"><span>SURAT MENYURAT</span></li>
+                    <li data-page="surat-siswa">
+                        <a href="#" data-nav="surat-siswa">
+                            <i class="fas fa-envelope-open-text"></i>
+                            <span>Surat Siswa</span>
+                        </a>
+                    </li>
+                    <li data-page="surat-guru">
+                        <a href="#" data-nav="surat-guru">
+                            <i class="fas fa-file-signature"></i>
+                            <span>Surat Guru</span>
+                        </a>
+                    </li>
+                    <li class="nav-divider"><span>PENGATURAN</span></li>
+                    <li data-page="settings">
+                        <a href="#" data-nav="settings">
+                            <i class="fas fa-cog"></i>
+                            <span>Ubah Password</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- TOP BAR -->
+            <header class="topbar">
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="topbar-title" id="pageTitle">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-logo-container" id="topbarLogoContainer">
+                        <img id="topbarPemdaLogo" src="" alt="Logo Pemda" style="display:none;">
+                        <img id="topbarSekolahLogo" src="" alt="Logo Sekolah" style="display:none;">
+                    </div>
+                    <div class="admin-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="adminName">Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- CONTENT AREA -->
+            <div class="content-area">
+                <!-- DASHBOARD -->
+                <div id="page-dashboard" class="page active">
+                    <div class="welcome-card">
+                        <div class="welcome-left">
+                            <div class="welcome-logos">
+                                <div class="welcome-logo-item" id="dashPemdaLogoWrap">
+                                    <img id="dashPemdaLogo" src="" alt="Logo Pemda" style="display:none;">
+                                    <i class="fas fa-landmark" id="dashPemdaDefault"></i>
+                                </div>
+                                <div class="welcome-logo-item" id="dashSekolahLogoWrap">
+                                    <img id="dashSekolahLogo" src="" alt="Logo Sekolah" style="display:none;">
+                                    <i class="fas fa-school" id="dashSekolahDefault"></i>
+                                </div>
+                            </div>
+                            <div class="welcome-text">
+                                <h2><i class="fas fa-hand-sparkles"></i> Selamat Datang, <span id="welcomeName">Admin</span>!</h2>
+                                <p id="welcomeSchoolName">Sistem Administrasi Surat Menyurat Sekolah</p>
+                                <p class="welcome-date" id="currentDate"></p>
+                            </div>
+                        </div>
+                        <div class="welcome-illustration">
+                            <i class="fas fa-envelope-open-text"></i>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card stat-blue">
+                            <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+                            <div class="stat-info">
+                                <h3 id="totalSiswa">0</h3>
+                                <p>Total Siswa</p>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-green">
+                            <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                            <div class="stat-info">
+                                <h3 id="totalGuru">0</h3>
+                                <p>Total Guru</p>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-orange">
+                            <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                            <div class="stat-info">
+                                <h3 id="totalSuratSiswa">0</h3>
+                                <p>Surat Siswa</p>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-purple">
+                            <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                            <div class="stat-info">
+                                <h3 id="totalSuratGuru">0</h3>
+                                <p>Surat Guru</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recent-section">
+                        <h3><i class="fas fa-history"></i> Riwayat Surat Terakhir</h3>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nomor Surat</th>
+                                        <th>Jenis</th>
+                                        <th>Nama</th>
+                                        <th>Tanggal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentLettersBody">
+                                    <tr><td colspan="5" class="empty-state">Belum ada surat</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IDENTITAS SEKOLAH -->
+                <div id="page-identitas" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-building"></i> Identitas Sekolah</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="identitasForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Nama Sekolah</label>
+                                        <input type="text" id="namaSekolah" placeholder="Contoh: SDN TESA">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>NPSN</label>
+                                        <input type="text" id="npsn" placeholder="Contoh: 20100001">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Alamat Sekolah</label>
+                                    <textarea id="alamatSekolah" rows="2" placeholder="Contoh: Jl. Pendidikan No. 123, Kec. Maju Jaya, Kota Tangerang"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Kabupaten/Kota</label>
+                                    <input type="text" id="kabupaten" placeholder="Contoh: TANGERANG">
+                                </div>
+
+                                <h4 class="section-title"><i class="fas fa-user-tie"></i> Identitas Kepala Sekolah</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Nama Kepala Sekolah</label>
+                                        <input type="text" id="namaKepsek" placeholder="Contoh: Budi Santoso, S.Pd., M.Pd.">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>NIP</label>
+                                        <input type="text" id="nipKepsek" placeholder="Contoh: 19800101 200501 1 001">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>NIK</label>
+                                        <input type="text" id="nikKepsek" placeholder="Contoh: 3603XXXXXXXXXXXX">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tempat, Tanggal Lahir</label>
+                                        <input type="text" id="ttlKepsek" placeholder="Contoh: Tangerang, 01-01-1980">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Pangkat dan Golongan</label>
+                                    <input type="text" id="pangkatKepsek" placeholder="Contoh: Pembina / IV.a">
+                                </div>
+
+                                <h4 class="section-title"><i class="fas fa-image"></i> Logo Kop Surat</h4>
+                                <p class="section-desc">Logo akan muncul secara realtime di seluruh halaman aplikasi dan kop surat saat dicetak.</p>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label><i class="fas fa-landmark"></i> Logo Pemda / Dinas (Kiri)</label>
+                                        <div class="upload-area" id="logoDinasArea">
+                                            <input type="file" id="logoDinas" accept="image/*">
+                                            <div class="upload-placeholder" id="previewLogoDinas">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p>Klik untuk upload logo Pemda</p>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-danger btn-sm btn-hapus-logo" id="btnHapusLogoDinas" style="display:none;margin-top:8px;">
+                                            <i class="fas fa-trash"></i> Hapus Logo Pemda
+                                        </button>
+                                    </div>
+                                    <div class="form-group">
+                                        <label><i class="fas fa-school"></i> Logo Sekolah (Kanan)</label>
+                                        <div class="upload-area" id="logoSekolahArea">
+                                            <input type="file" id="logoSekolah" accept="image/*">
+                                            <div class="upload-placeholder" id="previewLogoSekolah">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <p>Klik untuk upload logo Sekolah</p>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-danger btn-sm btn-hapus-logo" id="btnHapusLogoSekolah" style="display:none;margin-top:8px;">
+                                            <i class="fas fa-trash"></i> Hapus Logo Sekolah
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <h4 class="section-title"><i class="fas fa-hashtag"></i> Pengaturan Nomor Surat</h4>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Kode Surat</label>
+                                        <input type="text" id="kodeSurat" placeholder="Contoh: SDN-TESA">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tahun Surat</label>
+                                        <input type="text" id="tahunSurat" placeholder="Contoh: 2026">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nomor Surat Berikutnya</label>
+                                    <input type="number" id="nomorSurat" value="1" min="1">
+                                </div>
+                                <div class="surat-preview">
+                                    <label>Preview Format Nomor Surat:</label>
+                                    <div class="preview-text" id="previewNomorSurat">400.3.5 / 001 / SDN-TESA / 2026</div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Simpan Identitas
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DATA GURU -->
+                <div id="page-data-guru" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chalkboard-teacher"></i> Data Guru</h3>
+                            <div class="card-actions">
+                                <button class="btn btn-success btn-sm" id="btnAddGuru"><i class="fas fa-plus"></i> Tambah</button>
+                                <button class="btn btn-info btn-sm" id="btnImportGuru"><i class="fas fa-file-import"></i> Impor Excel</button>
+                                <input type="file" id="importGuru" accept=".xlsx,.xls" style="display:none">
+                                <button class="btn btn-outline btn-sm" id="btnTemplateGuru"><i class="fas fa-download"></i> Template</button>
+                                <button class="btn btn-danger btn-sm" id="btnHapusSemuaGuru"><i class="fas fa-trash"></i> Hapus Semua</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchGuru" placeholder="Cari guru..."></div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead><tr><th>No</th><th>Nama</th><th>NIP</th><th>NUPTK</th><th>TTL</th><th>Status</th><th>Jabatan</th><th>Aksi</th></tr></thead>
+                                    <tbody id="guruTableBody"><tr><td colspan="8" class="empty-state">Belum ada data guru</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DATA SISWA -->
+                <div id="page-data-siswa" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-user-graduate"></i> Data Siswa</h3>
+                            <div class="card-actions">
+                                <button class="btn btn-success btn-sm" id="btnAddSiswa"><i class="fas fa-plus"></i> Tambah</button>
+                                <button class="btn btn-info btn-sm" id="btnImportSiswa"><i class="fas fa-file-import"></i> Impor Excel</button>
+                                <input type="file" id="importSiswa" accept=".xlsx,.xls" style="display:none">
+                                <button class="btn btn-outline btn-sm" id="btnTemplateSiswa"><i class="fas fa-download"></i> Template</button>
+                                <button class="btn btn-danger btn-sm" id="btnHapusSemuaSiswa"><i class="fas fa-trash"></i> Hapus Semua</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchSiswa" placeholder="Cari siswa..."></div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead><tr><th>No</th><th>Nama</th><th>NISN</th><th>NIK</th><th>TTL</th><th>JK</th><th>Kelas</th><th>Aksi</th></tr></thead>
+                                    <tbody id="siswaTableBody"><tr><td colspan="8" class="empty-state">Belum ada data siswa</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SURAT SISWA -->
+                <div id="page-surat-siswa" class="page">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-envelope-open-text"></i> Surat Siswa</h3></div>
+                        <div class="card-body">
+                            <div class="surat-type-grid">
+                                <div class="surat-type-card" data-surat="pindah">
+                                    <div class="surat-type-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c);"><i class="fas fa-exchange-alt"></i></div>
+                                    <h4>Surat Pindah / Mutasi</h4><p>Surat keterangan pindah sekolah</p>
+                                </div>
+                                <div class="surat-type-card" data-surat="aktif">
+                                    <div class="surat-type-icon" style="background:linear-gradient(135deg,#4facfe,#00f2fe);"><i class="fas fa-check-circle"></i></div>
+                                    <h4>Surat Keterangan Aktif</h4><p>Surat keterangan aktif bersekolah</p>
+                                </div>
+                                <div class="surat-type-card" data-surat="diterima">
+                                    <div class="surat-type-icon" style="background:linear-gradient(135deg,#43e97b,#38f9d7);"><i class="fas fa-user-plus"></i></div>
+                                    <h4>Surat Diterima</h4><p>Surat penerimaan siswa baru/pindahan</p>
+                                </div>
+                            </div>
+
+                            <div id="formSuratSiswa" style="display:none;">
+                                <h4 class="section-title" id="titleSuratSiswa"></h4>
+                                <form id="suratSiswaForm">
+                                    <input type="hidden" id="jenisSuratSiswa">
+                                    <div class="form-group"><label>Pilih Siswa dari Database</label><select id="selectSiswa"><option value="">-- Pilih Siswa atau Isi Manual --</option></select></div>
+                                    <div class="form-row"><div class="form-group"><label>Nama Lengkap *</label><input type="text" id="suratNamaSiswa" required></div><div class="form-group"><label>NISN</label><input type="text" id="suratNisn"></div></div>
+                                    <div class="form-row"><div class="form-group"><label>NIK</label><input type="text" id="suratNikSiswa"></div><div class="form-group"><label>Tempat, Tgl Lahir</label><input type="text" id="suratTtlSiswa" placeholder="Tangerang, 22-12-2016"></div></div>
+                                    <div class="form-row"><div class="form-group"><label>Jenis Kelamin</label><select id="suratJkSiswa"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div><div class="form-group"><label>Kelas / Rombel</label><input type="text" id="suratKelasSiswa" placeholder="Kelas 3A"></div></div>
+                                    <div class="form-row"><div class="form-group"><label>Nama Ayah</label><input type="text" id="suratNamaAyah"></div><div class="form-group"><label>Pekerjaan Ayah</label><input type="text" id="suratPekerjaanAyah"></div></div>
+                                    <div class="form-group"><label>Alamat Lengkap</label><textarea id="suratAlamatSiswa" rows="2"></textarea></div>
+                                    <div id="fieldsPindah" style="display:none;"><div class="form-group"><label>Alasan Pindah</label><input type="text" id="suratAlasanPindah" placeholder="Contoh: Ikut orang tua"></div><div class="form-group"><label>Sekolah Tujuan</label><input type="text" id="suratSekolahTujuan" placeholder="Nama sekolah tujuan"></div></div>
+                                    <div id="fieldsDiterima" style="display:none;"><div class="form-group"><label>Asal Sekolah</label><input type="text" id="suratAsalSekolah" placeholder="Nama sekolah asal"></div><div class="form-group"><label>Diterima di Kelas</label><input type="text" id="suratDiterimaKelas" placeholder="Contoh: Kelas 4A"></div></div>
+                                    <div class="form-row"><div class="form-group"><label>Dikeluarkan di</label><input type="text" id="suratTempatSiswa" placeholder="Tangerang"></div><div class="form-group"><label>Pada Tanggal</label><input type="date" id="suratTanggalSiswa"></div></div>
+                                    <div class="form-row"><div class="form-group"><label>Ukuran Kertas</label><select id="kertasSuratSiswa"><option value="a4">A4</option><option value="f4">F4 (Folio)</option></select></div></div>
+                                    <div class="form-actions"><button type="button" class="btn btn-primary" id="btnPreviewSuratSiswa"><i class="fas fa-eye"></i> Preview & Cetak PDF</button><button type="button" class="btn btn-secondary" id="btnCancelSuratSiswa"><i class="fas fa-times"></i> Batal</button></div>
+                                </form>
+                            </div>
+
+                            <div class="recent-section" style="margin-top:30px;">
+                                <h3><i class="fas fa-history"></i> Riwayat Surat Siswa</h3>
+                                <div class="table-responsive">
+                                    <table class="data-table"><thead><tr><th>No</th><th>Nomor Surat</th><th>Jenis</th><th>Nama Siswa</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+                                    <tbody id="riwayatSuratSiswaBody"><tr><td colspan="6" class="empty-state">Belum ada riwayat</td></tr></tbody></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SURAT GURU -->
+                <div id="page-surat-guru" class="page">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-file-signature"></i> Surat Tugas Guru</h3></div>
+                        <div class="card-body">
+                            <div class="surat-type-grid single">
+                                <div class="surat-type-card" id="btnBuatSuratGuru">
+                                    <div class="surat-type-icon" style="background:linear-gradient(135deg,#667eea,#764ba2);"><i class="fas fa-file-signature"></i></div>
+                                    <h4>Buat Surat Tugas</h4><p>Surat tugas untuk guru</p>
+                                </div>
+                            </div>
+
+                            <div id="formSuratGuru" style="display:none;">
+                                <h4 class="section-title"><i class="fas fa-file-signature"></i> Form Surat Tugas Guru</h4>
+                                <form id="suratGuruForm">
+                                    <div class="form-group"><label>Pilih Guru dari Database</label><select id="selectGuru"><option value="">-- Pilih Guru atau Isi Manual --</option></select></div>
+                                    <div class="form-row"><div class="form-group"><label>Nama Lengkap *</label><input type="text" id="suratNamaGuru" required></div><div class="form-group"><label>Tempat, Tgl Lahir</label><input type="text" id="suratTtlGuru" placeholder="Tangerang, 30-11-1983"></div></div>
+                                    <div class="form-row"><div class="form-group"><label>NIP</label><input type="text" id="suratNipGuru"></div><div class="form-group"><label>NUPTK</label><input type="text" id="suratNuptkGuru"></div></div>
+                                    <div class="form-row"><div class="form-group"><label>Status Pegawai</label><input type="text" id="suratStatusGuru" placeholder="PNS / PPPK / Honorer"></div><div class="form-group"><label>Pangkat / Golongan</label><input type="text" id="suratPangkatGuru" placeholder="Contoh: Penata / III.c"></div></div>
+                                    <div class="form-group"><label>Jabatan / Tugas</label><input type="text" id="suratJabatanGuru" placeholder="Contoh: Guru Kelas"></div>
+                                    <div class="form-group"><label>Uraian Tugas</label><textarea id="suratUraianTugas" rows="4" placeholder="Tuliskan uraian tugas..."></textarea></div>
+                                    <div class="form-row"><div class="form-group"><label>Dikeluarkan di</label><input type="text" id="suratTempatGuru" placeholder="Tangerang"></div><div class="form-group"><label>Pada Tanggal</label><input type="date" id="suratTanggalGuru"></div></div>
+                                    <div class="form-row"><div class="form-group"><label>Ukuran Kertas</label><select id="kertasSuratGuru"><option value="a4">A4</option><option value="f4">F4 (Folio)</option></select></div></div>
+                                    <div class="form-actions"><button type="button" class="btn btn-primary" id="btnPreviewSuratGuru"><i class="fas fa-eye"></i> Preview & Cetak PDF</button><button type="button" class="btn btn-secondary" id="btnCancelSuratGuru"><i class="fas fa-times"></i> Batal</button></div>
+                                </form>
+                            </div>
+
+                            <div class="recent-section" style="margin-top:30px;">
+                                <h3><i class="fas fa-history"></i> Riwayat Surat Guru</h3>
+                                <div class="table-responsive">
+                                    <table class="data-table"><thead><tr><th>No</th><th>Nomor Surat</th><th>Nama Guru</th><th>Uraian Tugas</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+                                    <tbody id="riwayatSuratGuruBody"><tr><td colspan="6" class="empty-state">Belum ada riwayat</td></tr></tbody></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SETTINGS -->
+                <div id="page-settings" class="page">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-cog"></i> Ubah Password</h3></div>
+                        <div class="card-body">
+                            <form id="settingsForm" style="max-width:500px;">
+                                <div class="form-group"><label>Username Baru</label><input type="text" id="newUsername" placeholder="Username baru"></div>
+                                <div class="form-group"><label>Password Lama</label><input type="password" id="oldPassword" placeholder="Password lama" required></div>
+                                <div class="form-group"><label>Password Baru</label><input type="password" id="newPassword" placeholder="Password baru" required></div>
+                                <div class="form-group"><label>Konfirmasi Password Baru</label><input type="password" id="confirmPassword" placeholder="Ulangi password baru" required></div>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+    <div class="modal" id="modalGuru">
+        <div class="modal-header"><h3 id="modalGuruTitle"><i class="fas fa-plus"></i> Tambah Data Guru</h3><button class="modal-close" data-close="modal"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <form id="formTambahGuru">
+                <div class="form-group"><label>Nama Lengkap *</label><input type="text" id="guruNama" required></div>
+                <div class="form-row"><div class="form-group"><label>NIP</label><input type="text" id="guruNip"></div><div class="form-group"><label>NUPTK</label><input type="text" id="guruNuptk"></div></div>
+                <div class="form-group"><label>Tempat, Tanggal Lahir</label><input type="text" id="guruTtl" placeholder="Tangerang, 30-11-1983"></div>
+                <div class="form-row"><div class="form-group"><label>Status Pegawai</label><input type="text" id="guruStatus" placeholder="PNS/PPPK/Honorer"></div><div class="form-group"><label>Pangkat / Golongan</label><input type="text" id="guruPangkat"></div></div>
+                <div class="form-group"><label>Jabatan / Tugas</label><input type="text" id="guruJabatan" placeholder="Guru Kelas"></div>
+                <input type="hidden" id="guruEditIndex" value="-1">
+                <div class="form-actions"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button><button type="button" class="btn btn-secondary" data-close="modal"><i class="fas fa-times"></i> Batal</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="modalSiswa">
+        <div class="modal-header"><h3 id="modalSiswaTitle"><i class="fas fa-plus"></i> Tambah Data Siswa</h3><button class="modal-close" data-close="modal"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <form id="formTambahSiswa">
+                <div class="form-group"><label>Nama Lengkap *</label><input type="text" id="siswaNama" required></div>
+                <div class="form-row"><div class="form-group"><label>NISN</label><input type="text" id="siswaNisn"></div><div class="form-group"><label>NIK</label><input type="text" id="siswaNik"></div></div>
+                <div class="form-row"><div class="form-group"><label>Tempat, Tanggal Lahir</label><input type="text" id="siswaTtl" placeholder="Tangerang, 22-12-2016"></div><div class="form-group"><label>Jenis Kelamin</label><select id="siswaJk"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div></div>
+                <div class="form-group"><label>Kelas / Rombel</label><input type="text" id="siswaKelas" placeholder="Kelas 3A"></div>
+                <div class="form-row"><div class="form-group"><label>Nama Ayah</label><input type="text" id="siswaNamaAyah"></div><div class="form-group"><label>Pekerjaan Ayah</label><input type="text" id="siswaPekerjaanAyah"></div></div>
+                <div class="form-group"><label>Alamat Lengkap</label><textarea id="siswaAlamat" rows="2"></textarea></div>
+                <input type="hidden" id="siswaEditIndex" value="-1">
+                <div class="form-actions"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button><button type="button" class="btn btn-secondary" data-close="modal"><i class="fas fa-times"></i> Batal</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal modal-lg" id="modalPreviewSurat">
+        <div class="modal-header"><h3><i class="fas fa-file-pdf"></i> Preview Surat</h3><button class="modal-close" data-close="modal"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="preview-actions">
+                <button class="btn btn-primary" id="btnCetakPDF"><i class="fas fa-print"></i> Cetak / Simpan PDF</button>
+                <button class="btn btn-success" id="btnKirimWA"><i class="fab fa-whatsapp"></i> Kirim via WhatsApp</button>
+                <button class="btn btn-info" id="btnKirimEmail"><i class="fas fa-envelope"></i> Kirim via Email</button>
+            </div>
+            <div class="surat-preview-container" id="suratPreviewContainer"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
